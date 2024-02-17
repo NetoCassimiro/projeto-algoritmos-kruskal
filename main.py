@@ -1,4 +1,5 @@
 # Importando bibliotecas necessárias
+import networkx as nx
 import matplotlib.pyplot as plt
 from tkinter import *
 from src.script.read_database import get_nodes_and_edges
@@ -6,6 +7,39 @@ from src.script.read_database import get_nodes_and_edges
 # Obtendo informações dos nós e arestas da base de dados
 infos = get_nodes_and_edges()
 nodes, edges = infos[0], infos[1]
+
+# Função responsável por adicionar uma aresta com peso no grafo
+def add_edge(G, u, v, w=1):
+  G.add_edge(u, v, weight=w)
+
+def plot_full_graph():
+  plt.title("Grafo completo")
+  nx.draw_networkx(G, pos=nx.spring_layout(G), with_labels=True, node_size=500, node_color='lightgreen', font_size=10)
+  plt.show()
+  
+#cria um grafo vazio
+G = nx.Graph()
+
+# Adicionando vertices
+for node in nodes:
+  G.add_node(node['label'])
+
+# Adicionando arestas
+for edge in edges:
+  # A base de dados contém informações sobre os nós das arestas, sendo identificados pelo "ID". Os nós foram incorporados ao grafo com base em seus atributos "label"
+  # Portanto, é necessário localizar o nó através da label e verificar seu ID para adicionar a aresta de forma correta.
+  for node in nodes:
+    # Encontrando o nó incial da aresta
+    if node['id'] == edge[0]:
+      source_node = node
+
+    # Encontrando o nó final da aresta
+    elif node['id'] == edge[1]:
+      target_node = node
+
+  # Adiciona a aresta ao grafo caso encontre os dois nós 
+  if source_node and target_node:
+    add_edge(G, str(source_node['label']),str(target_node['label']),edge[2])
 
 # Criando a interface gráfica usando Tkinter
 window = Tk()
@@ -39,7 +73,7 @@ btn_show_mst = Button(window,
 # Botão para exibir o Grafo completo
 btn_show_full_grafo = Button(window,
                              text="Exibir o Grafo completo", 
-                             command="", 
+                             command=plot_full_graph, 
                              font=('Times New Roman CE', 16, 'bold'), 
                              bg="white", 
                              foreground="black", 
