@@ -1,4 +1,5 @@
 from operator import itemgetter
+from read_database import get_nodes_and_edges
 
 class DisjointSet(dict):
     def add(self, item):
@@ -47,12 +48,23 @@ def kruskal(nodes, edges):
             forest.union(t1, t2)
 
 # Teste
-nodes = list("ABCDEFG")
-edges = [("A", "B", 7), ("A", "D", 5),
-         ("B", "C", 8), ("B", "D", 9), ("B", "E", 7),
-         ("C", "E", 5),
-         ("D", "E", 15), ("D", "F", 6),
-         ("E", "F", 8), ("E", "G", 9),
-         ("F", "G", 11)]
+#recebendo os nós e arestas da base de dados
+infos = get_nodes_and_edges()
+nodes, edges = infos[0], infos[1]            
 
-print(kruskal(nodes, edges))
+#criando uma lista apenas com as labels dos nós, para ser adicionada no grafo
+formated_nodes = []
+for node in nodes:
+    formated_nodes.append(node['id'])
+
+print(formated_nodes)
+print(edges)
+# nodes = list("ABCDEFG")
+# edges = [("A", "B", 7), ("A", "D", 5),
+#          ("B", "C", 8), ("B", "D", 9), ("B", "E", 7),
+#          ("C", "E", 5),
+#          ("D", "E", 15), ("D", "F", 6),
+#          ("E", "F", 8), ("E", "G", 9),
+#          ("F", "G", 11)]
+
+print(kruskal(formated_nodes, edges))
