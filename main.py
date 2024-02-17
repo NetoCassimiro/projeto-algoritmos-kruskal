@@ -3,6 +3,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from tkinter import *
 from src.script.read_database import get_nodes_and_edges
+from src.script.kruskal import kruskal
 
 # Obtendo informações dos nós e arestas da base de dados
 infos = get_nodes_and_edges()
@@ -16,7 +17,51 @@ def plot_full_graph():
   plt.title("Grafo completo")
   nx.draw_networkx(G, pos=nx.spring_layout(G), with_labels=True, node_size=500, node_color='lightgreen', font_size=10)
   plt.show()
-  
+
+def get_mst():
+    # Recebendo os nós e arestas da base de dados
+    infos = get_nodes_and_edges()
+    nodes, edges = infos[0], infos[1]            
+
+    # Criando uma lista apenas com as labels dos nós, para ser adicionada no grafo
+    formatted_nodes = []
+    for node in nodes:
+        formatted_nodes.append(node['id'])
+
+    # Utilizando o algoritmo de Kruskal para obter a Árvore Geradora Mínima (MST)
+    return kruskal(formatted_nodes, edges)
+
+def plot_mst_graph():
+    # Obtendo a Árvore Geradora Mínima (MST)
+    mst = get_mst()
+    print(mst)
+
+    # Criando um grafo vazio
+    mst_graph = nx.Graph()
+    nodes_mst = []
+
+    # Adicionando os nós únicos da MST ao grafo
+    for node in mst:
+        if node[0] not in nodes_mst:
+            nodes_mst.append(node[0])
+
+        if node[1] not in nodes_mst:
+            nodes_mst.append(node[1])
+
+    # Adicionando vértices ao grafo
+    for node in nodes_mst:
+        mst_graph.add_node(node)
+
+    # Loop responsável por percorrer todos os nós da Árvore Geradora Mínima
+    for edge_node in mst:
+        # Adicionando arestas ao grafo
+        add_edge(mst_graph, edge_node[0], edge_node[1], edge_node[2])
+
+    # Plotando o subgrafo da Árvore Geradora Mínima
+    plt.title("Árvore geradora mínima (MST)")
+    nx.draw_networkx(mst_graph, pos=nx.spring_layout(mst_graph), with_labels=True, node_color='red', node_size=800)
+    plt.show()
+
 #cria um grafo vazio
 G = nx.Graph()
 
@@ -63,7 +108,7 @@ canvas.create_image(0, 0, image=bg, anchor="nw")
 # Botão para exibir a Árvore Geradora Mínima (MST)
 btn_show_mst = Button(window, 
                       text="Exibir a árvore geradora mínima (MST)", 
-                      command="", 
+                      command=plot_mst_graph, 
                       font=('Times New Roman CE', 16, 'bold'), 
                       bg="white", 
                       foreground="black", 
